@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SpigotMC Members</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      font-size: 1.7rem;
+      background: black;
+      color: white;
+      padding: 0;
+      margin: 0 10px 0 0;
+      font-family: sans-serif;
+    }
+    .input-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 5px 5px 5px;
+    }
+    input[type="number"] {
+      font-size: 1.5rem;
+    }
+    .input-row button {
+      font-size: 1.4rem;
+      height: 60px;
+    }
+    textarea {
+      flex-grow: 1;
+      height: 70px;
+      width: 300px;
+      font-size: 1.2rem;
+      background: #111;
+      color: #fff;
+      padding: 5px;
+      margin-left: 30px; 
+      resize: none;
+      border: 1px solid #555;
+    }
+    textarea:focus {
+      border: 1px solid #999;
+      outline: 0 none;
+    }
+
+    .iframe-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+    }
+    .iframe-container {
+      /*flex: 1 1 calc(50% - 12px);*/
+      display: grid;
+    }
+    .checkbox-row {
+      padding-top: 2px;
+      padding-bottom: 1px;
+      height: calc(100px);
+      background: #333;
+      overflow: hidden;
+    }
+    .checkbox-row:has(>input:checked) {
+      background: green;
+    }
+    input[type=checkbox] {
+      height: 100%;
+      width: 100%;
+      margin: 0;
+    }
+    .address-bar {
+      display: flex;
+      align-items: center;
+      gap: 0px;
+      margin-bottom: 2px;
+    }
+    .address-bar input[type="text"] {
+      font-size: 1.5rem;
+      flex: 1;
+      padding: 1px 5px;
+    }
+    .address-bar button {
+      font-size: 1.3rem;
+      padding: 1px 8px;
+    }
+    iframe {
+      width: calc(50vw - 15px);
+      height: calc((100vh - (35px + 5px + (2 * (39px + 2px)) + 6px)) / 2);
+      width: calc(25vw - 10px);
+      height: calc((100vh - (35px + 5px + (1 * (39px + 2px)))) / 1);
+      min-height: 350px;
+      border: 1px solid #444;
+      border-width: 0 1px 1px 1px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="input-row">
+      <label for="startId">Start-Member-ID:</label>
+      <input type="number" id="startId" value="1" min="1" />
+      <button onclick="updateIframes()" style="margin-left: 5px;">Go</button>
+      <button onclick="changeId(-4)" style="margin-left: 30px;">&nbsp;- 4&nbsp;</button>
+      <button onclick="changeId(4)" style="margin-left: 360px;">&nbsp;+ 4&nbsp;</button>
+      <textarea id="urlList" readonly></textarea>
+    </div>
+    <div id="iframes" class="iframe-row"></div>
+  </div>
+
+  <script>
+    function scrollTextareaToBottom() {
+      const textarea = document.getElementById("urlList");
+      textarea.scrollTop = textarea.scrollHeight;
+    }
+
+    function addUrlToTextarea(url) {
+      const textarea = document.getElementById("urlList");
+      const lines = textarea.value.split('\n').filter(line => line.trim() !== '');
+      if (!lines.includes(url)) {
+        lines.push(url);
+        textarea.value = lines.join('\n');
+        localStorage.setItem("savedUrlList", textarea.value);
+        scrollTextareaToBottom();
+      }
+    }
+
+    function removeUrlFromTextarea(url) {
+      const textarea = document.getElementById("urlList");
+      const lines = textarea.value.split('\n').filter(line => line.trim() !== '' && line !== url);
+      textarea.value = lines.join('\n');
+      localStorage.setItem("savedUrlList", textarea.value);
+      scrollTextareaToBottom();
+    }
+
+    function updateIframes() {
+      const startIdInput = document.getElementById('startId');
+      let startId = parseInt(startIdInput.value);
+      localStorage.setItem("startUserId", startId);
+      if (isNaN(startId) || startId < 1) startId = 1;
+      startIdInput.value = startId;
+
+      const container = document.getElementById('iframes');
+      container.innerHTML = '';
+      
+      const existingUrls = document.getElementById("urlList").value
+        .split('\n')
+        .map(line => line.trim())
+        .filter(line => line !== '');
+
+      for (let i = 0; i < 4; i++) {
+        const userId = startId + i;
+        const url = `https://www.spigotmc.org/members/${userId}`;
+
+        const col = document.createElement('div');
+        col.className = 'iframe-container';
+
+        // Checkbox to include URL
+        const checkboxRow = document.createElement('div');
+        checkboxRow.className = 'checkbox-row';
+
+        const checkbox = document.createElement('input');
+        checkbox.type = 'checkbox';
+        checkbox.id = `checkbox-${userId}`;
+        
+        if (existingUrls.includes(url)) {
+          checkbox.checked = true;
+        }
+
+        checkbox.addEventListener('change', function () {
+          if (this.checked) {
+            addUrlToTextarea(url);
+          } else {
+            removeUrlFromTextarea(url);
+          }
+        });
+
+        checkboxRow.appendChild(checkbox);
+        col.appendChild(checkboxRow);
+
+        // Create address bar
+        const addressBar = document.createElement('div');
+        addressBar.className = 'address-bar';
+
+        const urlInput = document.createElement('input');
+        urlInput.type = 'text';
+        urlInput.value = url;
+        urlInput.readOnly = true;
+        urlInput.onclick = function () {
+          this.select();
+          navigator.clipboard.writeText(urlInput.value);
+        };
+
+        const refreshButton = document.createElement('button');
+        refreshButton.textContent = '⟳';
+        refreshButton.title = 'Neu laden';
+
+        const iframe = document.createElement('iframe');
+        iframe.src = url;
+        iframe.setAttribute('sandbox', 'allow-scripts allow-same-origin');
+
+        refreshButton.onclick = () => {
+          iframe.src = iframe.src; // Reload iframe
+        };
+
+        addressBar.appendChild(urlInput);
+        addressBar.appendChild(refreshButton);
+
+        col.appendChild(addressBar);
+        col.appendChild(iframe);
+        container.appendChild(col);
+      }
+    }
+
+    function changeId(changeAmount) {
+      const startIdInput = document.getElementById('startId');
+      let current = parseInt(startIdInput.value);
+      const newVal = Math.max(1, current + changeAmount);
+      startIdInput.value = newVal;
+      localStorage.setItem("startUserId", newVal);
+      updateIframes();
+    }
+    function loadTextareaAutosave() {
+      const textarea = document.getElementById("urlList");
+
+      // Lade gespeicherten Inhalt beim Seitenstart
+      const saved = localStorage.getItem("savedUrlList");
+      if (saved) {
+        textarea.value = saved;
+      }
+    }
+    // Initial load
+    const startIdInput = document.getElementById('startId');
+    const savedId = localStorage.getItem("startUserId");
+    if (savedId && !startIdInput.dataset.loaded) {
+      startIdInput.value = savedId;
+      startIdInput.dataset.loaded = "true";  // Nur einmal laden
+    }
+
+    updateIframes();
+    loadTextareaAutosave();
+    scrollTextareaToBottom();
+
+    document.addEventListener("keydown", function(event) {
+      if (event.key === "ArrowLeft") {
+        changeId(-4);
+      } else if (event.key === "ArrowRight") {
+        changeId(4);
+      } else if (["1", "2", "3", "4"].includes(event.key)) {
+        const index = parseInt(event.key) - 1;
+        const container = document.getElementById("iframes");
+        const iframeContainer = container.children[index];
+        if (iframeContainer) {
+          const iframe = iframeContainer.querySelector("iframe");
+          if (iframe) {
+            iframe.src = iframe.src; // Neu laden
+          }
+        }
+      } else if (["q", "w", "e", "r"].includes(event.key)) {
+        const keyMap = { q: 0, w: 1, e: 2, r: 3 };
+        const index = keyMap[event.key];
+        const container = document.getElementById("iframes");
+        const checkbox = container.children[index]?.querySelector("input[type=checkbox]");
+        if (checkbox) {
+          checkbox.checked = !checkbox.checked;
+          checkbox.dispatchEvent(new Event("change")); // Damit add/removeUrlToTextarea ausgeführt wird
+        }
+      } else if (["a", "s", "d", "f"].includes(event.key)) {
+        const keyMap = { a: 0, s: 1, d: 2, f: 3 };
+        const index = keyMap[event.key];
+        const container = document.getElementById("iframes");
+        const iframeContainer = container.children[index];
+
+        if (iframeContainer) {
+          const iframe = iframeContainer.querySelector("iframe");
+          const urlInput = iframeContainer.querySelector("input[type=text]");
+          if (iframe && urlInput) {
+            const currentUrl = iframe.src;
+            const userIdMatch = currentUrl.match(/user_id=(\d+)/) || currentUrl.match(/\/members\/(\d+)/);
+            if (userIdMatch) {
+              const userId = userIdMatch[1];
+              const searchUrl = `https://www.spigotmc.org/search/member?user_id=${userId}`;
+              const profileUrl = `https://www.spigotmc.org/members/${userId}`;
+              const isSearch = currentUrl.includes("/search/member");
+
+              const newUrl = isSearch ? profileUrl : searchUrl;
+              iframe.src = newUrl;
+              urlInput.value = newUrl;
+            }
+          }
+        }
+      }
+    });
+  </script>
+</body>
+</html>
