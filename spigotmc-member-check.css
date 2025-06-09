@@ -1,0 +1,94 @@
+@-moz-document url-prefix("https://www.spigotmc.org/members/") {
+#info {
+    display: list-item !important;
+}
+
+.Responsive .profilePage {
+    display: grid;
+}
+.Responsive .profilePage > .mast,
+.Responsive .profilePage > .mainProfileColumn,
+.Responsive .profilePage > .mainProfileColumn > .primaryUserBlock {
+    display: contents;
+}
+.Responsive .profilePage > .mast > *,
+.Responsive .profilePage > .mainProfileColumn > *,
+.Responsive .profilePage > .mainProfileColumn > .primaryUserBlock > * {
+    width: 100%;
+    box-sizing: border-box;
+    grid-column: 1 / 3;
+}
+.Responsive .profilePage > .mainProfileColumn  > .primaryUserBlock > .secondaryContent {
+    order: -1;
+}
+.Responsive .profilePage .avatarScaler {
+    grid-column: 1;
+    grid-row: 2 / 4;
+}
+.Responsive .profilePage .mast .section.infoBlock:nth-child(2) {
+    grid-column: 2 / 3;
+    grid-row: 2;
+    align-self: center;
+    justify-self: center;
+    margin-top: 0;
+    margin-bottom: 0;
+}
+.Responsive .profilePage .mast .section.infoBlock:nth-child(2) dl:nth-child(3)> * {
+    font-weight: bold;
+    font-size: 30px;
+    line-height: 1.15;
+}
+
+.Responsive .profilePage .mast .section.infoBlock:nth-child(4) dl:has(> dd > a:not([href^=misc])) *  {
+    font-weight: bold;
+    font-size: 25px;
+    line-height: 1.15;
+    color: rgb(255, 0, 0);
+}
+#info .primaryContent .baseHtml {
+    font-weight: bold;
+    color: rgb(255, 0, 0);
+    font-size: 20px;
+}
+.Responsive .profilePage > .mast .section:nth-child(3) {
+    order: 3;
+    margin-top: 0;
+}
+.Responsive .profilePage > .mast .section:nth-child(4) {
+    grid-column: 2 / 3;
+    grid-row: 3;
+    align-self: center;
+    justify-self: center;
+    margin-top: 0;
+    margin-bottom: 0;
+}
+.Responsive .profilePage .primaryUserBlock .mainText {
+    padding-bottom: 10px;
+}
+.Responsive .profilePage .tabs.mainTabs {
+    margin-top: 5px;
+}
+
+form#ProfilePoster {
+    zdisplay: none;
+}
+form#ProfilePoster {
+    display: flex;
+    margin-bottom: 0px;
+}
+form#ProfilePoster .messageInfo {
+    display: contents;
+}
+form#ProfilePoster textarea {
+    display: inline-block;
+    margin: 0 10px;
+    height: 48px;
+    align-self: center;
+}
+form#ProfilePoster .submitUnit {
+    display: inline-block;
+    margin: 0;
+    width: initial !important;
+    align-self: center;
+}
+}
